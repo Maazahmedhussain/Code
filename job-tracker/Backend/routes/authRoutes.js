@@ -3,7 +3,23 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js"; // Ensure correct path
 
+import protect from "../middleware/authMiddleware.js"; // Import middleware
+
 const router = express.Router();
+
+
+
+
+
+// ✅ Protected Route: Get User Profile
+router.get("/profile", protect, async (req, res) => {
+  try {
+    res.json(req.user); // Send user details (already fetched in middleware)
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch user profile" });
+  }
+});
+
 
 // User Registration Route
 router.post("/register", async (req, res) => {
