@@ -1,33 +1,33 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import User from "../models/User.js"; // Ensure correct path
 
 const router = express.Router();
 
-// User Registration
+// User Registration Route
 router.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
-    // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: "User already exists" });
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create new user
     const newUser = new User({ name, email, password: hashedPassword });
-    await newUser.save();
 
-    res.status(201).json({ message: "User registered successfully" });
+    const savedUser = await newUser.save();
+    console.log("✅ User saved in MongoDB:", savedUser); // ✅ Debugging log
+
+    res.status(201).json({ message: "User registered successfully", user: savedUser });
   } catch (error) {
+    console.error("❌ Registration Error:", error);
     res.status(500).json({ error: "Registration failed" });
   }
 });
 
-// User Login
+
+// ✅ User Login Route
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -46,5 +46,5 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ error: "Login failed" });
   }
 });
-
+// Export the Router
 export default router;
